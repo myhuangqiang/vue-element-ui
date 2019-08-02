@@ -1,8 +1,8 @@
 <template>
     <div class="dialog-container">
         <el-dialog
-            :title="dialogDatas.title"
-            :width="dialogDatas.width"
+            :title="dialogDatas.title == 'isEdit' ? '编辑' : '新增'"
+            :width="dialogDatas.width || '720px'"
             :visible.sync="visible"
             @close="$emit('updateShow', false)"
             :show="show">

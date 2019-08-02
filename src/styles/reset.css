@@ -52,20 +52,20 @@
    -webkit-backface-visibility: hidden;
  }
  ::-webkit-scrollbar{
-   width: 5px;
-   height: 5px;
+   width: 8px;
+   height: 8px;
  }
  ::-webkit-scrollbar-track-piece{
-   background-color: rgba(0, 0, 0, 0.2);
+   background-color: rgba(255, 255, 255, 0);
    -webkit-border-radius: 6px;
  }
  ::-webkit-scrollbar-thumb:vertical{
-   height: 5px;
+   height: 6px;
    background-color: rgba(125, 125, 125, 0.7);
    -webkit-border-radius: 6px;
  }
  ::-webkit-scrollbar-thumb:horizontal{
-   width: 5px;
+   width: 6px;
    background-color: rgba(125, 125, 125, 0.7);
    -webkit-border-radius: 6px;
  }

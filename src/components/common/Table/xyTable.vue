@@ -40,11 +40,11 @@
             :align="item.align" 
             :render-header="item.require?renderHeader:null"
             >
-              <template slot-scope="scope" >
+              <template slot-scope="scope">
                 <!-- html -->
                 <span v-if="item.type==='Html'" v-html="item.html(scope.row)"></span>
                 <!-- 按钮 -->
-                <span v-if="item.type==='Button'" >
+                <span v-if="item.type==='Button'">
                   <span v-for="(btn, index) in item.btnList" :key="index" style="margin-right: 8px;">
                     <el-button 
                       v-if="!btn.isShow || (btn.isShow && btn.isShow(scope.$index, scope.row))"
@@ -52,7 +52,7 @@
                       :type="btn.type" 
                       :size="btn.size || size" 
                       :icon="btn.icon" 
-                      @click.stop="btn.handle(scope.row)">{{btn.label}}</el-button>
+                      @click.stop="btn.handle(scope.row, scope.$index)">{{btn.label}}</el-button>
                   </span>
                   </span>
                 <!-- 输入框 :disabled="btn.isDisabled && btn.isDisabled(scope.row)"-->
@@ -93,20 +93,20 @@
                   @change='item.change && item.change(scope.row)'></el-slider>
                 <!-- 默认 -->
                 <span 
-                  v-if="!item.type && !item.isMultiple" 
+                  v-if="!item.type" 
                   :style="item.itemStyle && item.itemStyle(scope.row)" 
                   :class="item.itemClass && item.item.itemClass(scope.row)"
                 >
                   {{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}
                 </span>
                 <!-- 表格数据中有list数据 -->
-                <span 
+                <!-- <span 
                   v-if="item.isMultiple" 
                   :style="item.itemStyle && item.itemStyle(scope.row)" 
                   :class="item.itemClass && item.item.itemClass(scope.row)"
                 >
-                  <span>{{(item.formatter && item.formatter(scope.row)).join('、') || scope.row[item.prop].join('、')}}</span>
-                </span>
+                  <span>{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</span>
+                </span> -->
               </template>
             </el-table-column>
       </el-table>
@@ -117,9 +117,9 @@
         @current-change="handleCurrentChange"
         @size-change="handleSizeChange"
         layout="total,sizes ,prev, pager, next,jumper"
-        :page-sizes="[5, 10, 15, 20]"
-        :page-size="pagination.pageSize"
-        :current-page="pagination.pageNum"
+        :page-sizes="[10, 15, 20, 25]"
+        :page-size="pagination.limit"
+        :current-page="pagination.offset"
         :total="pagination.total"
       ></el-pagination>
     </section>
@@ -150,7 +150,7 @@ export default {
     // 是否显示分页
     isPagination:{ type: Boolean, default: true },
     // 分页数据
-    pagination:{ type: Object, default:()=>({pageSize:5,pageNum:1,total:0}) },
+    pagination:{ type: Object, default:()=>({limit:10,offset:1,total:0}) },
     
   },
   data(){
@@ -186,11 +186,13 @@ export default {
     },
     
     handleCurrentChange(val){
-      this.pagination.pageNum = val;
+      console.log('handleCurrentChange' + val)
+      this.pagination.offset = val
       this.$emit('refresh');
     },
     handleSizeChange(val) {
-      this.pagination.pageSize = val;
+      console.log(val)
+      this.pagination.limit = val
       this.$emit('refresh');
     },
     
@@ -220,5 +222,8 @@ export default {
 .el-table th>.cell {
   font-weight: bold;
   font-size: 14px;
+}
+.el-table__body-wrapper {
+  height: auto !important;
 }
 </style>

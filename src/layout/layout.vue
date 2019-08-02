@@ -16,7 +16,6 @@
 					@close="handleClose"
 					mode="vertical"
 					:collapse-transition="false"
-					:unique-opened="true"
 				>
 					<!--加上router 才能实现跳转-->
 					<NavMenu :navMenus="leftMenus.childs"></NavMenu>
@@ -94,6 +93,9 @@ export default {
 				this.$store.dispatch('app/hideSideBar', true)
 			}
 		}
+		// document.querySelector('.main-container').onscroll = function() {
+		// 	console.log(111)
+		// }
   	},
 }
 </script>
@@ -137,6 +139,9 @@ export default {
 			background: #fff;
 			.container {
 				padding: 20px 14px 0;
+				// position: absolute;
+				// left: 0;
+				// top: 82px;
 			}
 		}
 	}

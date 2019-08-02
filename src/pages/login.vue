@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="login-btn">
-                    <el-button type="primary" @click="Login">
+                    <el-button :loading="loginLoading" type="primary" @click="Login">
                         <span>登录</span>
                     </el-button>
                 </div>
@@ -37,17 +37,23 @@
 export default {
     data() {
         return {
-            userName: 'huangqiang',
-            psw: '123456'
+            loginLoading: false,
+            userName: '',
+            psw: ''
         }
     },
     methods: {
         Login() {
-            this.$store.commit('user/LOGIN',true)
-            this.$router.push({  //核心语句
-                path:'/',       //跳转的路径
-                query:{         //路由传参时push和query搭配使用 ，作用时传递参数
-                    // id: this.id ,  
+            if (!this.userName || !this.psw) {
+                this.$message.error('用户名或密码不能为空！') 
+                return false
+            }
+            this.loginLoading = true
+            this.$api.login({username: this.userName, passwordmd5: this.$md5(this.psw)}).then(res => {
+                this.loginLoading = false
+                if (res.code == 0) {
+                    this.$store.commit('user/LOGIN',{datas: res.data, userName: this.userName})
+                    this.$router.push({path:'/'}) 
                 }
             })
         }

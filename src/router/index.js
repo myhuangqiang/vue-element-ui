@@ -6,9 +6,19 @@ import Router from 'vue-router'
 const Login = () => import('@/pages/login')
 const Main = () => import('@/pages/main')
 const Home = () => import('@/pages/home')
-const Auth = () => import('@/pages/system/auth')
-const Role = () => import('@/pages/system/role')
-const Menu = () => import('@/pages/system/role')
+
+const Merchant = () => import('@/pages/promotion/merchant')
+const Product = () => import('@/pages/promotion/product')
+const Plan = () => import('@/pages/promotion/plan')
+const KeyWord = () => import('@/pages/promotion/keyword')
+
+const DayAgr = () => import('@/pages/dataManage/dayagr')
+const Halfhouragr = () => import('@/pages/dataManage/halfhouragr')
+
+const User = () => import('@/pages/system/user')
+const OfflineTask = () => import('@/pages/system/offlinetask')
+const Preference = () => import('@/pages/system/preference')
+
 const Error404 = () => import('@/pages/errorPages/404')
 // 下面2行代码，指定了相同的webpackChunkName，会合并打包成一个js文件。
 // const ImportFuncDemo = () => import(/* webpackChunkName: 'ImportFuncDemo' */ '../components/ImportFuncDemo')
@@ -46,35 +56,35 @@ const router = new Router({
       ]
     },
     {
-      name: "systemManage",
-      path: '/system',
+      name: "promotion",
+      path: '/promotion',
       component: Main,
-      redirect:'/system/auth',
-      meta: { title: '系统管理' },
+      redirect:'/promotion/auth',
+      meta: { title: '推广管理' },
       children: [
         {
-          name: "权限管理",
-          path: '/system/auth',
-          component: Auth,
-          meta: { title: '权限管理' },
+          name: "商户",
+          path: '/promotion/merchant',
+          component: Merchant,
+          meta: { title: '商户' },
         },
         {
-          name: "角色管理",
-          path: '/system/role',
-          component: Role,
-          meta: { title: '角色管理' },
+          name: "产品",
+          path: '/promotion/product',
+          component: Product,
+          meta: { title: '产品' },
         },
         {
-          name: "菜单管理",
-          path: '/system/menu',
-          component: Menu,
-          meta: { title: '菜单管理' },
+          name: "计划",
+          path: '/promotion/plan',
+          component: Plan,
+          meta: { title: '计划' },
         },
         {
-          name: "分组管理",
-          path: '/system/group',
-          component: Menu,
-          meta: { title: '分组管理' },
+          name: "关键词",
+          path: '/promotion/keyword',
+          component: KeyWord,
+          meta: { title: '关键词' }
         }
       ]
     },
@@ -88,7 +98,7 @@ const router = new Router({
         {
           name: "积分管理",
           path: '/user/integral',
-          component: Menu,
+          component: User,
           meta: { title: '积分管理' },
         },
       ]
@@ -103,69 +113,93 @@ const router = new Router({
         {
           name: "邮箱管理",
           path: '/account/email',
-          component: Menu,
+          component: User,
           meta: { title: '邮箱管理' },
         },
         {
           name: "密码管理",
           path: '/account/pass',
-          component: Menu,
+          component: User,
           meta: { title: '密码管理' },
         }
       ]
     },
     {
-      name: "contentManage",
-      path: '/content',
+      name: "systemManage",
+      path: '/system',
       component: Main,
-      redirect:'/content/classify',
-      meta: { title: '内容管理' },
+      redirect:'/system/preference',
+      meta: { title: '系统管理' },
       children: [
         {
-          name: "分类管理",
-          path: '/content/classify',
-          component: Menu,
-          meta: { title: '分类管理' },
+          name: "参数",
+          path: '/system/preference',
+          component: Preference,
+          meta: { title: '参数' }
         },
         {
-          name: "文章管理",
-          path: '/content/article',
-          component: Menu,
-          meta: { title: '文章管理' },
+          name: "离线任务",
+          path: '/system/offlinetask',
+          component: OfflineTask,
+          meta: { title: '离线任务' }
         },
         {
-          name: "评论管理",
-          path: '/content/comment',
-          component: Menu,
-          meta: { title: '评论管理' },
+          name: "用户",
+          path: '/system/user',
+          component: User,
+          meta: { title: '用户' },
         }
+      ]
+    },
+    {
+      name: "dataManage",
+      path: '/dataManage',
+      component: Main,
+      redirect:'/datamanage/dayagr',
+      meta: { title: '数据报表' },
+      children: [
+        {
+          name: "每日汇总",
+          path: '/datamanage/dayagr',
+          component: DayAgr,
+          meta: { title: '每日汇总' }
+        },
+        {
+          name: "半小时渠道数据",
+          path: '/datamanage/halfhouragr',
+          component: Halfhouragr,
+          meta: { title: '半小时渠道数据' }
+        }
+        
       ]
     },
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requireLogin){  // 判断该路由是否需要登录权限
-    if (JSON.parse(localStorage.getItem('islogin'))) {  // 判断当前用户的登录信息islogin是否存在
+  // if (to.meta.requireLogin){  // 判断该路由是否需要登录权限
+  //   if (JSON.parse(localStorage.getItem('islogin'))) {  // 判断当前用户的登录信息islogin是否存在
+  //     next()
+  //   } else {
+  //     next({
+  //       path: '/login'
+  //     })
+  //   }
+  // } else {
+  //   next()
+  // }
+  if (JSON.parse(localStorage.getItem('islogin'))) {  // 判断当前用户的登录信息islogin是否存在
+    next()
+  } else {
+    console.log(to)
+    if (to.name == 'login') {
       next()
     } else {
       next({
         path: '/login'
       })
     }
-  } else {
-    next()
   }
-  /*如果本地 存在 token 则 不允许直接跳转到 登录页面*/
-  // if(to.fullPath == "/login"){
-  //   if(JSON.parse(localStorage.getItem('islogin'))){
-  //     next({
-  //       path: from.fullPath
-  //     });
-  //   }else {
-  //     next()
-  //   }
-  // }
 })
 
 

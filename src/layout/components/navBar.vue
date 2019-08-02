@@ -21,7 +21,7 @@
             <el-dropdown>
                 <span class="el-dropdown-link">
                     <img width="24" height="24"  src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" alt="">
-                    <span>黄强</span>
+                    <span>{{userInfos.userName}}</span>
                     <i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
@@ -47,14 +47,14 @@ export default{
     },
     computed: {
         ...mapState({
-            'sideBarOpened': state => state.app.sideBarOpened
+            'sideBarOpened': state => state.app.sideBarOpened,
+            'userInfos': state => state.user.userInfos
         })
     },
     methods:{
         quit() {
             // 退出登录
-            this.$store.commit('user/LOGIN', false)
-            this.$router.push("/login")
+            this.$store.dispatch('user/logOutAction', {userid: this.userInfos.datas.userid})
         },
         fullscreenFn() {
             let element = document.documentElement;
@@ -102,6 +102,13 @@ export default{
         position: relative;
         background: #002140;
         color: #fff;
+
+        // position: fixed;
+        // width: calc(100% - 210px);
+        // height: 50px;
+        // z-index: 200;
+        // left: 210px;
+        // top: 0;
         .hamburger-container {
             line-height: 60px;
             height: 100%;

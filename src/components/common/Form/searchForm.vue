@@ -22,11 +22,11 @@
                 <el-checkbox v-for="ch in item.checkboxs" :label="ch.value" :key="ch.value">{{ch.label}}</el-checkbox>
             </el-checkbox-group>
             <!-- 日期 -->
-            <el-date-picker v-if="item.type==='Date'" :placeholder="item.placeholder" v-model="searchData[item.prop]"></el-date-picker>
+            <el-date-picker v-if="item.type==='Date'" value-format="yyyy-MM-dd" :placeholder="item.placeholder" v-model="searchData[item.prop]"></el-date-picker>
             <!-- 时间 -->
             <el-time-select v-if="item.type==='Time'" v-model="searchData[item.prop]" type=''></el-time-select>
             <!-- 日期时间 -->
-            <el-date-picker v-if="item.type==='DateTime'" type='datetime' v-model="searchData[item.prop]" :disabled="item.disable && item.disable(searchData[item.prop])"></el-date-picker>
+            <el-date-picker v-if="item.type==='DateTime'" type='datetime' :placeholder="item.placeholder" v-model="searchData[item.prop]" :disabled="item.disable && item.disable(searchData[item.prop])"></el-date-picker>
             <!-- 滑块 -->
             <!-- <el-slider v-if="item.type==='Slider'" v-model="searchData[item.prop]"></el-slider> -->
             <!-- 开关 -->

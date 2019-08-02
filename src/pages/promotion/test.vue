@@ -168,6 +168,8 @@ export default {
             }
         }
     },
+    mounted () {
+    },
     methods: {
         // 表格中button条件限制（是否显示）
         showEdit(index,row) {

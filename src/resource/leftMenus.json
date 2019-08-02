@@ -14,7 +14,7 @@
         {
             "entity": {
                 "name": "systemManage",
-                "icon": "el-icon-message",
+                "icon": "el-icon-rank",
                 "alias": "系统管理",
                 "value": null,
                 "discription": "用于系统管理的菜单"
@@ -22,134 +22,114 @@
             "childs": [
                 {
                     "entity": {
-                    "name": "authManage",
+                        "name": "preferenceManage",
+                        "icon": "el-icon-printer",
+                        "alias": "参数",
+                        "value": "/system/preference",
+                        "discription": "用于参数的菜单"
+                    },
+                    "childs": null
+                },
+                {
+                    "entity": {
+                        "name": "offlinetask",
+                        "icon": "el-icon-printer",
+                        "alias": "离线任务",
+                        "value": "/system/offlinetask",
+                        "discription": "离线任务"
+                    },
+                    "childs": null
+                },
+                {
+                    "entity": {
+                    "name": "userManage",
+                    "icon": "el-icon-mobile-phone",
+                    "alias": "用户",
+                    "value": "/system/user",
+                    "discription": "用于用户管理的菜单"
+                    },
+                    "childs": null
+                }
+            ]
+        },
+
+        {
+            "entity": {
+                "name": "promotion",
+                "icon": "el-icon-message",
+                "alias": "推广管理",
+                "value": null,
+                "discription": "用于推广的菜单"
+            },
+            "childs": [
+                {
+                    "entity": {
+                    "name": "merchantManage",
                     "icon": "el-icon-loading",
-                    "alias": "权限管理",
-                    "value": "/system/auth",
+                    "alias": "商户",
+                    "value": "/promotion/merchant",
                     "discription": "用于权限管理的菜单"
                     },
                     "childs": null
                 },
                 {
                     "entity": {
-                    "name": "roleManage",
+                    "name": "productManage",
                     "icon": "el-icon-bell",
-                    "alias": "角色管理",
-                    "value": "/system/role",
-                    "discription": "用于角色管理的菜单"
+                    "alias": "产品",
+                    "value": "/promotion/product",
+                    "discription": "用于产品管理的菜单"
                     },
                     "childs": null
                 },
                 {
                     "entity": {
-                    "name": "menuManage",
+                    "name": "planManage",
                     "icon": "el-icon-edit",
-                    "alias": "菜单管理",
-                    "value": "/system/menu",
-                    "discription": "用于菜单管理的菜单"
+                    "alias": "计划",
+                    "value": "/promotion/plan",
+                    "discription": "用于计划管理的菜单"
                     },
                     "childs": null
                 },
                 {
                     "entity": {
-                    "name": "groupManage",
-                    "icon": "el-icon-mobile-phone",
-                    "alias": "分组管理",
-                    "value": "/system/group",
-                    "discription": "用于分组管理的菜单"
-                    },
-                    "childs": null
-                }
-            ]
-        },
-        {
-            "entity": {
-                "name": "userManage",
-                "icon": "el-icon-news",
-                "alias": "用户管理",
-                "value": null,
-                "discription": "用于用户管理的菜单"
-            },
-            "childs": [
-                {
-                    "entity": {
-                        "name": "accountManage",
-                        "icon": "el-icon-phone-outline",
-                        "alias": "帐号管理",
-                        "value": null,
-                        "discription": "用于帐号管理的菜单"
-                    },
-                    "childs": [
-                        {
-                            "entity": {
-                                "name": "emailManage",
-                                "icon": "el-icon-sold-out",
-                                "alias": "邮箱管理",
-                                "value": "/account/email",
-                                "discription": "用于邮箱管理的菜单"
-                            },
-                            "childs": null
-                        },
-                        {
-                            "entity": {
-                                "name": "passManage",
-                                "icon": "el-icon-service\r\n",
-                                "alias": "密码管理",
-                                "value": "/account/pass",
-                                "discription": "用于密码管理的菜单"
-                            },
-                            "childs": null
-                        }
-                    ]
-                },
-                {
-                    "entity": {
-                        "name": "integralManage",
-                        "icon": "el-icon-picture",
-                        "alias": "积分管理",
-                        "value": "/user/integrals",
-                        "discription": "用于积分管理的菜单"
-                    },
-                    "childs": null
-                }
-            ]
-        },
-        {
-            "entity": {
-                "name": "contentManage",
-                "icon": "el-icon-rank",
-                "alias": "内容管理",
-                "value": null,
-                "discription": "用于内容管理的菜单"
-            },
-            "childs": [
-                {
-                    "entity": {
-                        "name": "classifyManage",
+                        "name": "keyword",
                         "icon": "el-icon-printer",
-                        "alias": "分类管理",
-                        "value": "/content/classify",
-                        "discription": "用于分类管理的菜单"
+                        "alias": "关键词",
+                        "value": "/promotion/keyword",
+                        "discription": "关键词"
+                    },
+                    "childs": null
+                }
+            ]
+        },
+        {
+            "entity": {
+                "name": "dataManage",
+                "icon": "el-icon-rank",
+                "alias": "数据报表",
+                "value": null,
+                "discription": "用于数据报表的菜单"
+            },
+            "childs": [
+                {
+                    "entity": {
+                        "name": "dayagrManage",
+                        "icon": "el-icon-printer",
+                        "alias": "每日汇总",
+                        "value": "/datamanage/dayagr",
+                        "discription": "用于每日汇总的菜单"
                     },
                     "childs": null
                 },
                 {
                     "entity": {
-                        "name": "articleManage",
-                        "icon": "el-icon-star-on",
-                        "alias": "文章管理",
-                        "value": "/content/article",
-                        "discription": "用于文章管理的菜单"
-                    },
-                    "childs": null
-                },
-                {
-                    "entity": {
-                        "name": "commentManage",
-                        "icon": "el-icon-share",
-                        "alias": "评论管理",
-                        "value": "/content/comment",
-                        "discription": "用于评论管理的菜单"
+                        "name": "orderDataHalfhouragr",
+                        "icon": "el-icon-printer",
+                        "alias": "半小时渠道数据",
+                        "value": "/datamanage/halfhouragr",
+                        "discription": "半小时渠道数据"
                     },
                     "childs": null
                 }

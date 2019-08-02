@@ -232,4 +232,59 @@ export function validatenull(val) {
     }
     return false;
 
-};
+}; 
+
+/**
+ * 去除对象中的空值
+ * @params: 对象， 是否递归
+ */
+export function deleteNullProperties(obj, recurse) {
+    for (var i in obj) {
+        if (!obj[i]) {
+            delete obj[i];
+        } else if (recurse && typeof obj[i] === 'object') {
+            delete_null_properties(obj[i], recurse);
+        }
+    }
+	return obj
+}
+
+/** 
+* 配合后台接口where 查询字段语法 
+*/
+const OpMappings = {
+    'gt': ">",
+    'gte': ">=",
+    'lt': "<",
+    'lte': "<=",
+    'eq': "=",
+    'neq': "!="
+}
+export function buildWhere(whereObj) {
+    let where = ["AND", "1=1"]
+    for (let k in whereObj) {
+        let arr = k.split(".")
+        if (arr.length == 2) {
+            if (OpMappings[arr[1]]) {
+                where.push([OpMappings[arr[1]], arr[0], whereObj[k]])
+            } else {
+                where.push([arr[1], arr[0], whereObj[k]])
+            }
+            
+        } else {
+            where.push(k+"=\""+whereObj[k] + "\"")
+        }       
+    }
+    return where
+}
+
+export function randomChar(l)  {
+  let x="0123456789qwertyuioplkjhgfdsazxcvbnm"
+  let tmp=""
+  let timestamp = new Date().getTime()
+  for(var  i=0;i<  l;i++)  {
+ 	tmp += x.charAt(Math.ceil(Math.random()*100000000)%x.length)
+  }
+  return  timestamp+tmp
+}
+

@@ -14,9 +14,10 @@ const KeyWord = () => import('@/pages/promotion/keyword')
 
 const DayAgr = () => import('@/pages/dataManage/dayagr')
 const Halfhouragr = () => import('@/pages/dataManage/halfhouragr')
+const Merchantagr = () => import('@/pages/dataManage/merchantagr')
 
 const User = () => import('@/pages/system/user')
-const OfflineTask = () => import('@/pages/system/offlinetask')
+const OfflineTask = () => import('@/pages/system/offlineTask')
 const Preference = () => import('@/pages/system/preference')
 
 const Error404 = () => import('@/pages/errorPages/404')
@@ -28,6 +29,7 @@ const Error404 = () => import('@/pages/errorPages/404')
 Vue.use(Router)
 
 const router = new Router({
+  base: '/xy-channel-admin/',
   mode: 'history',
   routes: [
     {
@@ -59,7 +61,7 @@ const router = new Router({
       name: "promotion",
       path: '/promotion',
       component: Main,
-      redirect:'/promotion/auth',
+      redirect:'/promotion/merchant',
       meta: { title: '推广管理' },
       children: [
         {
@@ -85,42 +87,6 @@ const router = new Router({
           path: '/promotion/keyword',
           component: KeyWord,
           meta: { title: '关键词' }
-        }
-      ]
-    },
-    {
-      name: "userManage",
-      path: '/user',
-      component: Main,
-      redirect:'/user/integral',
-      meta: { title: '用户管理' },
-      children: [
-        {
-          name: "积分管理",
-          path: '/user/integral',
-          component: User,
-          meta: { title: '积分管理' },
-        },
-      ]
-    },
-    {
-      name: "accountManage",
-      path: '/account',
-      component: Main,
-      redirect:'/account/email',
-      meta: { title: '账号管理' },
-      children: [
-        {
-          name: "邮箱管理",
-          path: '/account/email',
-          component: User,
-          meta: { title: '邮箱管理' },
-        },
-        {
-          name: "密码管理",
-          path: '/account/pass',
-          component: User,
-          meta: { title: '密码管理' },
         }
       ]
     },
@@ -165,12 +131,17 @@ const router = new Router({
           meta: { title: '每日汇总' }
         },
         {
+          name: "商户汇总",
+          path: '/datamanage/merchantagr',
+          component: Merchantagr,
+          meta: { title: '商户汇总' }
+        },
+        {
           name: "半小时渠道数据",
           path: '/datamanage/halfhouragr',
           component: Halfhouragr,
           meta: { title: '半小时渠道数据' }
         }
-        
       ]
     },
   ]

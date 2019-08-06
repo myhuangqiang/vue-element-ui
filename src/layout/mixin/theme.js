@@ -63,23 +63,25 @@ export default function () {
         if (link.length) {
           for (let i = link.length - 3; i < link.length; i++) {
             const style = link[i];
-            this.getCSSString(style.href, innerText => {
-            const originalCluster = this.getThemeCluster(
-              ORIGINAL_THEME.replace("#", "")
-            );
-            const newStyle = this.updateStyle(
-              innerText,
-              originalCluster,
-              themeCluster
-            );
-            let styleTag = document.getElementById(i);
-            if (!styleTag) {
-              styleTag = document.createElement("style");
-              styleTag.id = i;
-              styleTag.innerText = newStyle;
-              head.appendChild(styleTag);
+            if (style && style.href) {
+              this.getCSSString(style.href, innerText => {
+              const originalCluster = this.getThemeCluster(
+                ORIGINAL_THEME.replace("#", "")
+              );
+              const newStyle = this.updateStyle(
+                innerText,
+                originalCluster,
+                themeCluster
+              );
+              let styleTag = document.getElementById(i);
+              if (!styleTag) {
+                styleTag = document.createElement("style");
+                styleTag.id = i;
+                styleTag.innerText = newStyle;
+                head.appendChild(styleTag);
+              }
+              });
             }
-            });
           }
         }
 

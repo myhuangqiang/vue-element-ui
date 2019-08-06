@@ -239,6 +239,23 @@ export function getTime(type) {
 }
 
 /**
+ * @param {String} str
+ */
+export function formatStr(str) {
+  if (!str && typeof str !== 'string') {
+    return '无';
+    throw new Error('error arguments', 'formatStr')
+  }
+  if (str.includes('.')) {
+    return str.replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
+  } else {
+    var reg=/\d{1,3}(?=(\d{3})+$)/g;   
+    return (str + '').replace(reg, '$&,');  
+  }
+}
+
+
+/**
  * @param {Function} func
  * @param {number} wait
  * @param {boolean} immediate

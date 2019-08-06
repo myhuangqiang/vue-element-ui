@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :isHandle='true'
@@ -142,8 +141,8 @@ export default {
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('user', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('user', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },

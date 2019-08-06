@@ -14,13 +14,10 @@
             size='medium'
             :isSelection='false'
             :isPagination='true'
-            :isTotal="true"
             :isHandle='true'
             :loading="tableLoading"
             :tableData='tableData' 
             :tableCols='tableCols' 
-            :totalCols='totalCols'
-            :totalDatas="totalDatas"
             :pagination='pagination'
             @refresh="refresh"
         >
@@ -37,14 +34,8 @@ import { deleteNullProperties, buildWhere } from '@/utils/validate'
 
 import { mapState } from 'vuex'
 
-let year = new Date().getFullYear()
-let month = new Date().getMonth()
-let day = new Date().getDate()
-
-console.log(year,month,day)
-
 let searchData = {
-    'daytime.gte': new Date(year,month, day)
+    'day.gte': new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
 }
 
 export default {
@@ -60,11 +51,8 @@ export default {
             // 查询组件 start
             searchForm:[
                 {type:'Select',label:'商户',prop:'_merchantid',width:'140px',placeholder:'请选择', options: [], change: () => ''},
-                {type:'Select',label:'计划',prop:'_planid',width:'140px',placeholder:'请选择', options: [], change: () => ''},
-                {type:'Select',label:'产品',prop:'_productid',width:'140px',placeholder:'请选择', options: [], change: () => ''},
-                {type:'Input',label:'关键字ID',prop:'_keywordid',width:'150px',placeholder:'请输入关键字ID'},
-                {type:'DateTime', defaultTime: '00:00:00', label:'开始日期',prop:'daytime.gte',width:'200px',placeholder:'开始日期时间'},
-                {type:'DateTime',label:'结束日期',prop:'daytime.lte',width:'200px',placeholder:'结束日期时间'},
+                {type:'Date', defaultTime: '00:00:00', label:'开始日期',prop:'day.gte',width:'200px',placeholder:'开始日期时间'},
+                {type:'Date',label:'结束日期',prop:'day.lte',width:'200px',placeholder:'结束日期时间'},
             ],
             searchHandle:[ 
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -78,11 +66,11 @@ export default {
             tableData:[],
             // 表格header
             tableCols:[
-                {label:'日期',prop:'daytime', width: '160px'},
+                // {label:'日期',prop:'daytime', width: '160px'},
                 {label:'商户',prop:'_merchantid', formatter: (row) => this.formatterOfMerchant(row) },
-                {label:'计划',prop:'_planid', formatter: (row) => this.formatterOfPlan(row) },
-                {label:'产品',prop:'_productid', formatter: (row) => this.formatterOfProduct(row) },
-                {label:'关键词ID',prop:'_keywordid'},
+                // {label:'计划',prop:'_planid', formatter: (row) => this.formatterOfPlan(row) },
+                // {label:'产品',prop:'_productid', formatter: (row) => this.formatterOfProduct(row) },
+                // {label:'关键词ID',prop:'_keywordid'},
                 {label:'订单数',prop:'totalcount'},
                 {label:'付费数',prop:'totalpaidcount'},
                 {label:'付费金额',prop:'totalpaidamount'},
@@ -90,16 +78,6 @@ export default {
                 {label:'劫持付费数',prop:'hijackpaidcount'},
                 {label:'劫持付费金额',prop:'hijackpaidamount'},
             ],
-            // 统计数据
-            totalCols: [
-                {label: '订单数：', prop: 'totalcount'},
-                {label: '付费数：', prop: 'totalpaidcount'},
-                {label: '付费金额：', prop: 'totalpaidamount'},
-                {label: '劫持订单数：', prop: 'hijackcount'},
-                {label: '劫持付费数：', prop: 'hijackpaidcount'},
-                {label: '劫持付费金额：', prop: 'hijackpaidamount'},
-            ],
-            totalDatas:{},
             // 翻页
             pagination:{
                 limit: 10,
@@ -118,8 +96,6 @@ export default {
     computed: {
         ...mapState({
             merchantList: state => state.global.merchantList,
-            planList: state => state.global.planList,
-            productList: state => state.global.productList
         })
     },
     async created() {
@@ -128,8 +104,6 @@ export default {
         let p3 = this.$store.dispatch('global/getProductList',{select: ['productid', 'productname']})
         let res = await Promise.all([p1, p2, p3])
         this.searchForm[0].options = this.merchantList
-        this.searchForm[1].options = this.planList
-        this.searchForm[2].options = this.productList
         this.quertTableDatasCount()
         this.queryTableDatas()
     },
@@ -138,9 +112,8 @@ export default {
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('orderdata-halfhouragr', {select: ['count(1) as count', 'sum(totalcount) as totalcount', 'sum(totalpaidcount) as totalpaidcount', 'sum(totalpaidamount) as totalpaidamount','sum(hijackcount) as hijackcount', 'sum(hijackpaidcount) as hijackpaidcount', 'sum(hijackpaidamount) as hijackpaidamount'], where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data[0].count)
-                this.totalDatas = res.data[0]
+            return this.$api.query('orderdata-merchantagr', {select: ['count(1) as count']}).then(res => {
+                this.pagination.total = parseInt(res.data.length)
                 return res
             })
         },
@@ -149,9 +122,9 @@ export default {
             deleteNullProperties(this.searchData)
             params.offset = (this.pagination.offset - 1) * this.pagination.limit
             params.limit = this.pagination.limit
-            params.orderBy = 'id desc'
             params.where = buildWhere(this.searchData)
-            return this.$api.query('orderdata-halfhouragr', params).then(res => {
+            params.select = ["_merchantid", "sum(totalcount) as totalcount","sum(totalpaidcount) as totalpaidcount","sum(totalpaidamount) as totalpaidamount","sum(hijackcount) as hijackcount","sum(hijackpaidcount) as hijackpaidcount","sum(hijackpaidamount) as hijackpaidamount"]
+            return this.$api.query('orderdata-merchantagr', params).then(res => {
                 this.tableLoading = false
                 this.tableData = res.data
                 return res
@@ -165,26 +138,10 @@ export default {
                 return filterMerchant[0].label
             }
         },
-        formatterOfPlan(row) {
-            let filterPlan = this.planList.filter(function(product){
-                return product.value == row._planid
-            })
-            if (filterPlan.length) {
-                return filterPlan[0].label
-            }
-        },
-        formatterOfProduct(row) {
-            let filterProduct = this.productList.filter(function(product){
-                return product.value == row._productid
-            })
-            if (filterProduct.length) {
-                return filterProduct[0].label
-            }
-        },
         // 点击查询按钮
         searchHandleForm() {
-            if (this.searchData['daytime.gte'] && this.searchData['daytime.lte']) {
-                if (new Date(this.searchData['daytime.lte']).getTime() < new Date(this.searchData['daytime.gte']).getTime()) {
+            if (this.searchData['day.gte'] && this.searchData['day.lte']) {
+                if (new Date(this.searchData['day.lte']).getTime() < new Date(this.searchData['day.gte']).getTime()) {
                     this.$message.error('开始日期时间不能大于结束日期时间')
                     return false;
                 }
@@ -205,7 +162,8 @@ export default {
         // 导出文件（请求去除翻页）
         exportTableDatas(params = {}) {
             params.where = buildWhere(this.searchData)
-            return this.$api.exportCsv('orderdata-halfhouragr', params)
+            params.select = ["_merchantid", "sum(totalcount) as totalcount","sum(totalpaidcount) as totalpaidcount","sum(totalpaidamount) as totalpaidamount","sum(hijackcount) as hijackcount","sum(hijackpaidcount) as hijackpaidcount","sum(hijackpaidamount) as hijackpaidamount"]
+            return this.$api.exportCsv('orderdata-merchantagr', params)
         },
         // 导出数据成excel
         exportExcel(item) {
@@ -219,17 +177,12 @@ export default {
                 }
             }).then(() => {
                 import('@/vendor/Export2Excel').then(excel => {
-                    const tHeader = ['日期', '商户', '计划', '关键词ID', '订单数', '付费数', '付费金额', '劫持订单数', '劫持付费数', '劫持付费金额']
-                    const filterVal = ['daytime', '_merchantid', '_planid', '_keywordid', 'totalcount', 'totalpaidcount', 'totalpaidamount', 'hijackcount', 'hijackpaidcount', 'hijackpaidamount']
+                    const tHeader = ['商户', '订单数', '付费数', '付费金额', '劫持订单数', '劫持付费数', '劫持付费金额']
+                    const filterVal = ['_merchantid', 'totalcount', 'totalpaidcount', 'totalpaidamount', 'hijackcount', 'hijackpaidcount', 'hijackpaidamount']
                     list.forEach((item) => {
                         this.merchantList.forEach((el) => {
                             if (item._merchantid == el.value) {
                                 item._merchantid = el.label
-                            }
-                        })
-                        this.planList.forEach((el) => {
-                            if (item._planid == el.value) {
-                                item._planid = el.label
                             }
                         })
                     })
@@ -237,7 +190,7 @@ export default {
                     excel.export_json_to_excel({
                         header: tHeader,
                         data,
-                        filename: '半小时渠道数据'
+                        filename: '商户汇总'
                     })
                 })
                 item.isLoading = false

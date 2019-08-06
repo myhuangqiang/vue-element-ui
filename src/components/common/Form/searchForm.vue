@@ -7,7 +7,12 @@
             <el-input clearable v-if="item.type==='Input'" v-model="searchData[item.prop]" :size="size" :placeholder="item.placeholder" :style="{width: item.width}"></el-input>
             <!-- 下拉框 -->
             <el-select clearable v-if="item.type==='Select'" :placeholder="item.placeholder" v-model="searchData[item.prop]" :style="{width: item.width}" :size="size" @change="item.change(searchData[item.prop])">
-                <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value"></el-option>
+                <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value">
+                    <div v-if="item.slot">
+                        <span style="float: left">{{ op.label }}</span>
+                        <span style="float: right; color: #8492a6; font-size: 13px">{{ op.value }}</span>
+                    </div>
+                </el-option>
             </el-select>
             <!-- 单选 -->
             <el-radio-group v-if="item.type==='Radio'" v-model="searchData[item.prop]">
@@ -22,11 +27,11 @@
                 <el-checkbox v-for="ch in item.checkboxs" :label="ch.value" :key="ch.value">{{ch.label}}</el-checkbox>
             </el-checkbox-group>
             <!-- 日期 -->
-            <el-date-picker v-if="item.type==='Date'" value-format="yyyy-MM-dd" :placeholder="item.placeholder" v-model="searchData[item.prop]"></el-date-picker>
+            <el-date-picker v-if="item.type==='Date'" :style="{width: item.width}" :default-time="item.defaultTime" value-format="yyyy-MM-dd" :placeholder="item.placeholder" v-model="searchData[item.prop]"></el-date-picker>
             <!-- 时间 -->
-            <el-time-select v-if="item.type==='Time'" v-model="searchData[item.prop]" type=''></el-time-select>
+            <el-time-select v-if="item.type==='Time'" :style="{width: item.width}" v-model="searchData[item.prop]" type=''></el-time-select>
             <!-- 日期时间 -->
-            <el-date-picker v-if="item.type==='DateTime'" type='datetime' :placeholder="item.placeholder" v-model="searchData[item.prop]" :disabled="item.disable && item.disable(searchData[item.prop])"></el-date-picker>
+            <el-date-picker v-if="item.type==='DateTime'" :style="{width: item.width}" format="yyyy-MM-dd HH:mm:ss" value-format="yyyy-MM-dd HH:mm:ss" type='datetime' :default-time="item.defaultTime" :placeholder="item.placeholder" v-model="searchData[item.prop]" :disabled="item.disable && item.disable(searchData[item.prop])"></el-date-picker>
             <!-- 滑块 -->
             <!-- <el-slider v-if="item.type==='Slider'" v-model="searchData[item.prop]"></el-slider> -->
             <!-- 开关 -->

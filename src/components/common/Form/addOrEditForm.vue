@@ -17,7 +17,12 @@
                 @change="item.change && item.change(editData[item.prop])"
                 :style="{width:item.width || '200px'}"
                 :disabled="item.disabled && item.disabled(editData)">
-                <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value"></el-option>
+                <el-option v-for="op in item.options" :label="op.label" :value="op.value" :key="op.value">
+                    <div v-if="item.slot">
+                        <span style="float: left; margin-right: 20px;">{{ op.label }}</span>
+                        <span style="float: right; color: #8492a6; font-size: 13px">{{ op.value }}</span>
+                    </div>
+                </el-option>
             </el-select>
             <!-- 单选 -->
             <el-radio-group v-if="item.type==='radio'" v-model="editData[item.prop]"
@@ -152,8 +157,8 @@ export default {
         }
     },
     mounted() {
-        if (this.editData.importfile) {
-            this.fileList = [{name: this.editData.importfile, url: this.editData.importfile}]
+        if (this.editData.material) {
+            this.fileList = [{name: this.editData.material, url: this.editData.material}]
         } else {
             this.fileList = []
         }

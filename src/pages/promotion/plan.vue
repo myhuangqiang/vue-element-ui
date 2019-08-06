@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :loading="tableLoading"
@@ -43,6 +42,7 @@ import xyModal from '@/components/common/Modal/xyModal'
 import xyEdit from '@/components/common/Form/addOrEditForm'
 
 import { deleteNullProperties, buildWhere, randomChar } from '@/utils/validate'
+import { createUniqueString }  from '@/utils'
 
 import { mapState } from 'vuex'
 
@@ -63,13 +63,9 @@ export default {
             searchData: Object.assign({}, searchData),
             // 查询组件 start
             searchForm:[
-                {type:'Input',label:'计划名称',prop:'planname.like',width:'180px',placeholder:'请输入计划名称'},
-                {label:'商户名称',prop:'merchantid', type:'Select', options: []},
-                {label:'产品名称',prop:'productid', type:'Select', options: []},
-                {type:'Input',label:'额外参数',prop:'extraparam.like',width:'180px',placeholder:'请输入额外参数'},
-                {type:'Select',label:'是否劫持',prop:'hijack',width:'180px',placeholder:'请选择', options: [{label: '是', value: '1'},{label: '否', value: '0'}], change: () => '' },
-                {type:'Input',label:'劫持关键词',prop:'hjkeyword.like',width:'180px',placeholder:'请输入劫持关键词', change: () => '' },
-                {type:'Input',label:'劫持目标',prop:'hjtarget.like',width:'180px',placeholder:'请输入劫持目标', change: () => '' },
+                {type:'Input',label:'计划名称',prop:'planname.like',width:'150px',placeholder:'请输入计划名称'},
+                {label:'商户名称',prop:'_merchantid', type:'Select',width:'150px', options: [], change: () => ''},
+                {label:'产品名称',prop:'_productid', type:'Select',width:'150px', options: [], change: () => ''},
             ],
             searchHandle:[
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -86,8 +82,8 @@ export default {
             tableCols:[
                 {label:'计划ID',prop:'planid'},
                 {label:'计划名称',prop:'planname'},
-                {label:'商户名称',prop:'merchantid', formatter: (row) => this.formatterOfMerchant(row) },
-                {label:'产品名称',prop:'productid',  formatter: (row) => this.formatterOfProduct(row)},
+                {label:'商户名称',prop:'_merchantid', formatter: (row) => this.formatterOfMerchant(row) },
+                {label:'产品名称',prop:'_productid', formatter: (row) => this.formatterOfProduct(row)},
                 {label:'额外参数',prop:'extraparam'},
                 {label: '是否劫持', prop: 'hijack', formatter: (row) => {
                     if (row.hijack == 1) {
@@ -97,12 +93,13 @@ export default {
                     }
                 }},
                 {label:'劫持关键词',prop:'hjkeyword', width: '100px'},
-                {label:'导入文件', width:'280px', prop:'material', formatter: (row) => {
-                    if (row.material) {
-                        return location.origin + '/' + row.material
-                    }
+                {label:'导入文件', prop:'material', down: true, formatter: (row) => {
+                    // if (row.material) {
+                    //     return '/' + row.material
+                    // }
                 }},
-                {label:'导出文件',prop:'output'},
+                {label:'导出动作',prop:'outputaction', formatter: (row) =>  this.formatterOfOutputaction(row)},
+                {label:'导出文件',prop:'output', down: true},
                 {label:'备注',prop:'remark'},
                 {label:'操作', width: '220px',type:'Button',btnList:[
                     {type:'primary',label:'编辑',isShow: (index,row) => true, isDisabled: (index,row) => false,handle:row=>this.edit(row)},
@@ -124,7 +121,7 @@ export default {
             // 新增编辑数据弹窗
             dialogDatas: {
                 title: '新增', // 新增或编辑
-                // width: '500px' // dialog 宽度
+                width: '800px' // dialog 宽度
             },
             that: this,
 
@@ -132,13 +129,14 @@ export default {
             editForm: [
                 {label:'计划ID',prop:'planid', type:'input', disabled: () => {return true}},
                 {label:'计划名称',prop:'planname', type:'input'},
-                {label:'商户名称',prop:'merchantid', type:'select', options: []},
-                {label:'产品名称',prop:'productid', type:'select', options: []},
+                {label:'商户名称',prop:'_merchantid', type:'select', options: []},
+                {label:'产品名称',prop:'_productid', type:'select', options: []},
                 {label:'额外参数',prop:'extraparam', type:'input'},
                 {label:'是否劫持',prop:'hijack', type:'select', options: [{label: '否', value: 0}, {label: '是', value: 1}]},
                 {label:'劫持目标',prop:'hjtarget', type:'input'},
                 {label:'劫持关键词',prop:'hjkeyword', type:'input'},
                 {label:'计划关键字', prop: 'material', type:'upload'},
+                {label:'导出动作', prop: 'outputaction', type:'select', slot: true, options: []},
                 {label:'备注',prop:'remark', type:'textarea'},
             ],
             // 编辑表单的数据
@@ -153,24 +151,33 @@ export default {
     computed: {
         ...mapState({
             merchantList: state => state.global.merchantList,
-            productList: state => state.global.productList
+            productList: state => state.global.productList,
+            preferenceList: state => state.global.preferenceList
         })
     },
     async created() {
-        await this.$store.dispatch('global/getMerchantList', {select: ['merchantid', 'merchantname']})
+        let p1 = this.$store.dispatch('global/getMerchantList', {select: ['merchantid', 'merchantname']})
+        let p2 = this.$store.dispatch('global/getProductList', {select: ['productid', 'productname']})
+        let p3 = this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["outputaction"]]}).then(() => {
+            let planactionInPreferenceList = this.preferenceList.filter((item) => {
+                return item.fieldkey == 'outputaction'
+            })
+            this.getSelectDatas(this.editForm, planactionInPreferenceList, 'outputaction')
+        })
+        let res = await Promise.all([p1, p2, p3])
         this.searchForm[1].options = this.merchantList
-        await this.$store.dispatch('global/getProductList', {select: ['productid', 'productname']})
         this.searchForm[2].options = this.productList
         this.quertTableDatasCount()
         this.queryTableDatas()
+        
     },
     mounted () {
     },
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('plan', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('plan', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },
@@ -188,7 +195,7 @@ export default {
         },
         formatterOfMerchant(row) {
             let filterMerchant = this.merchantList.filter(function(product){
-                return product.value == row.merchantid
+                return product.value == row._merchantid
             })
             if (filterMerchant.length) {
                 return filterMerchant[0].label
@@ -196,10 +203,18 @@ export default {
         },
         formatterOfProduct(row) {
             let filterProduct= this.productList.filter(function(product){
-                return product.value == row.productid
+                return product.value == row._productid
             })
             if (filterProduct.length) {
                 return filterProduct[0].label
+            }
+        },
+        formatterOfOutputaction(row) {
+            let filteroutputaction= this.editForm[9].options.filter(function(product){
+                return product.value == row.outputaction
+            })
+            if (filteroutputaction.length) {
+                return filteroutputaction[0].label
             }
         },
         // 新增或编辑的弹出dialog
@@ -222,6 +237,25 @@ export default {
             this.editForm[2].options = this.merchantList
             this.editForm[3].options = this.productList
             this.editData = editRow
+        },
+         // 遍历select中的数据
+        getSelectDatas(data,list,prop) {
+            data.forEach((item) => {
+                if (item.prop == prop) {
+                    let platformList = list[0].fieldvalue
+                    platformList.forEach((el) => {
+                        try {
+                            let newItem = JSON.parse(el)
+                            Object.keys(newItem).forEach((keyItem) => {
+                                item.options.push({label: keyItem,value: newItem[keyItem]})
+                            }) 
+                        }catch(error) {
+                            item.options.push({label: el,value: el})
+                        }
+                    })
+                    return false
+                }
+            })
         },
         // 表格数据删除按钮
         del(row) {
@@ -253,14 +287,14 @@ export default {
         },
         // 生成一个计划
         produceDownloadFile(row, index) {
-            console.log(row,index)
             // 先将导入文件随机生成一个文件名，不能重名
             let material = row.material
-            let fileFormat = material.substr(material.lastIndexOf("."))
-            let exportFile = `dowms/${randomChar(10)}${fileFormat}`
+            // let fileFormat = material.substr(material.lastIndexOf("."))
+            // let exportFile = `downs/${createUniqueString()}${fileFormat}`
+            let exportFile = `downs/${createUniqueString()}.csv`
             let planId = row.planid
             // 创建一个离线任务,传action、exportFile
-            this.$api.add('offline-task', {action: '测试', output: exportFile, taskname: randomChar(5)}).then(res => {
+            this.$api.add('offline-task', {action: row.outputaction, taskname: createUniqueString(), output: exportFile, remark: '自动生成', params: {"planid": row.planid}}).then(res => {
                 if (res.code == 0) {
                     // 成功之后将此条计划的output 赋值为exportFile
                     this.tableData[index].output = exportFile
@@ -268,6 +302,7 @@ export default {
                         message: '生成成功！',
                         type: 'success'
                     })
+                    this.$api.update('plan', {planid: row.planid, output: exportFile})
                 }
             })
 
@@ -358,20 +393,17 @@ export default {
                 }
             }).then(() => {
                 import('@/vendor/Export2Excel').then(excel => {
-                    const tHeader = ['计划ID', '计划名称','商户名称', '产品名称', '额外参数', '是否劫持', '劫持关键词', '导入文件', '导出文件', '备注']
-                    const filterVal = ['planid', 'planname', 'merchantid', 'productid', 'extraparam', 'hijack', 'hjkeyword', 'material', 'output', 'remark']
+                    const tHeader = ['计划ID', '计划名称','商户名称', '产品名称', '额外参数', '是否劫持', '劫持关键词', '导入文件', '导出动作', '导出文件', '备注']
+                    const filterVal = ['planid', 'planname', '_merchantid', '_productid', 'extraparam', 'hijack', 'hjkeyword', 'material', 'outputaction', 'output', 'remark']
                     list.forEach((item) => {
-                        if (item.material) {
-                            item.material = location.origin + '/' + item.material
-                        }
                         this.merchantList.forEach((el) => {
-                            if (item.merchantid == el.value) {
-                                item.merchantid = el.label
+                            if (item._merchantid == el.value) {
+                                item._merchantid = el.label
                             }
                         })
                         this.productList.forEach((el) => {
-                            if (item.productid == el.value) {
-                                item.productid = el.label
+                            if (item._productid == el.value) {
+                                item._productid = el.label
                             }
                         })
                     })

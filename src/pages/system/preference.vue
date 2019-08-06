@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :isHandle='true'
@@ -53,7 +52,7 @@ export default {
             searchData: Object.assign({}, searchData),
             // 查询组件 start
             searchForm:[
-                {type:'Input',label:'参数名称',prop:'key',width:'180px',placeholder:'请输入参数名称'},
+                {type:'Input',label:'参数名称',prop:'fieldkey.like',width:'180px',placeholder:'请输入参数名称'},
             ],
             searchHandle:[
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -66,14 +65,14 @@ export default {
             tableData:[],
             // 表格header
             tableCols:[
-                {label:'参数名称',prop:'key'},
-                {label:'备注',prop:'remark'},
-                {label:'参数列表',prop:'value', formatter: (row) => {
-                    if (!row.value) {
+                {label:'参数名称',prop:'fieldkey'},
+                {label:'参数列表',prop:'fieldvalue', formatter: (row) => {
+                    if (!row.fieldvalue) {
                         return ''
                     }
-                    return row.value.join('、')
+                    return row.fieldvalue.join('，')
                 }},
+                {label:'备注',prop:'remark'},
                 {label:'操作', width: '150px',type:'Button',btnList:[
                     {isShow: (index,row) => true, isDisabled: (index,row) => false, type:'primary',label:'编辑',handle:row=>this.edit(row)},
                     {type:'danger',label:'删除',handle:row=> this.del(row)}
@@ -100,15 +99,13 @@ export default {
             // 编辑的数据
             editData: {},
 
-            // 支持模糊查询得字段
-            supportLikeKeys: ['key']
         }
     },
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('preference', {aggregation: 'count', where: buildWhere(this.supportLikeKeys, this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('preference', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },
@@ -117,7 +114,7 @@ export default {
             deleteNullProperties(this.searchData)
             params.offset = (this.pagination.offset - 1) * this.pagination.limit
             params.limit = this.pagination.limit
-            params.where = buildWhere(this.supportLikeKeys, this.searchData)
+            params.where = buildWhere(this.searchData)
             return this.$api.query('preference', params).then(res => {
                 this.tableLoading = false
                 this.tableData = res.data

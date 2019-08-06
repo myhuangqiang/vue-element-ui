@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :isHandle='true'
@@ -64,7 +63,7 @@ export default {
             // 查询组件 start
             searchForm:[
                 {type:'Input',label:'关键词',prop:'keyword.like',width:'180px',placeholder:'请输入关键词'},
-                // {type:'Input',label:'keywordstr',prop:'keywordstr.like',width:'180px',placeholder:'请输入keywordstr'},
+                {type:'Input',label:'关键词ID',prop:'keywordid.like',width:'180px',placeholder:'请输入关键词ID'},
             ],
             searchHandle:[
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -125,8 +124,8 @@ export default {
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('keyword', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('keyword', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },

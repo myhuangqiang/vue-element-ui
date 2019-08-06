@@ -30,9 +30,9 @@ const mutations = {
   
   
 const actions = {
-    getPreferenceList({commit}) {
-        return api.query('preference').then(res => {
-            if (res.code == 0) {
+    getPreferenceList({commit}, playload) {
+        return api.query('preference',playload).then(res => {
+            if (res && res.code == 0) {
                 commit('GET_PREFERENCE_LIST', res.data)
             }
             return res
@@ -40,7 +40,7 @@ const actions = {
     },
     getMerchantList({commit}, playload) {
         return api.query('merchant', playload).then(res => {
-            if (res.code == 0 && res.data) {
+            if (res && res.code == 0 && res.data) {
                 let merchantList = []
                 res.data.forEach((item) => {
                     merchantList.push({label: item.merchantname, value: item.merchantid})
@@ -52,7 +52,7 @@ const actions = {
     },
     getPlanList({commit}, playload) {
         return api.query('plan', playload).then(res => {
-            if (res.code == 0 && res.data) {
+            if (res && res.code == 0 && res.data) {
                 let planList = []
                 res.data.forEach((item) => {
                     planList.push({label: item.planname, value: item.planid})
@@ -64,7 +64,7 @@ const actions = {
     },
     getProductList({commit}, playload) {
         return api.query('product', playload).then(res => {
-            if (res.code == 0 && res.data) {
+            if (res && res.code == 0 && res.data) {
                 let productList = []
                 res.data.forEach((item) => {
                     productList.push({label: item.productname, value: item.productid})

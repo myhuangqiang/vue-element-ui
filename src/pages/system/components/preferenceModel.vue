@@ -8,7 +8,7 @@
             :show="show">
             <el-form  label-width="80px">
                 <el-form-item label="参数名称">
-                    <el-input type="input" v-model="params.key"></el-input>
+                    <el-input type="input" v-model="params.fieldkey"></el-input>
                 </el-form-item>
                 <el-form-item label="备注">
                     <el-input type="textarea" v-model="params.remark"></el-input>
@@ -16,7 +16,7 @@
                 <el-form-item label="参数内容">
                     <el-tag
                         :key="tag"
-                        v-for="tag in params.value"
+                        v-for="tag in params.fieldvalue"
                         closable
                         :disable-transitions="false"
                         @close="handleClose(tag)">
@@ -53,9 +53,9 @@ export default {
             inputValue: '',
             
             params: {
-                key: '',
+                fieldkey: '',
                 remark: '',
-                value: []
+                fieldvalue: []
             },
             visible: this.show
         }
@@ -76,7 +76,7 @@ export default {
     },
     methods: {
         handleClose(tag) {
-            this.params.value.splice(this.params.value.indexOf(tag), 1);
+            this.params.fieldvalue.splice(this.params.fieldvalue.indexOf(tag), 1);
         },
 
         showInput() {
@@ -88,8 +88,8 @@ export default {
 
         handleInputConfirm() {
             let inputValue = this.inputValue;
-            if (inputValue && !this.params.value.includes(inputValue)) {
-                this.params.value.push(inputValue);
+            if (inputValue && !this.params.fieldvalue.includes(inputValue)) {
+                this.params.fieldvalue.push(inputValue);
             }
             this.inputVisible = false;
             this.inputValue = '';
@@ -108,16 +108,16 @@ export default {
             if (!this.visible) {
                 this.inputVisible = false
                 this.inputValue = ''
-                this.params.key = ''
+                this.params.fieldkey = ''
                 this.params.remark = ''
-                this.params.value = []
+                this.params.fieldvalue = []
                 delete this.params.preferenceid
             }
             if (this.dialogDatas.title == 'isEdit' && this.visible) {
                 this.params = {
-                    key: this.editData.key,
+                    fieldkey: this.editData.fieldkey,
                     remark: this.editData.remark,
-                    value: this.editData.value,
+                    fieldvalue: this.editData.fieldvalue,
                     preferenceid: this.editData.preferenceid
                 }
             }

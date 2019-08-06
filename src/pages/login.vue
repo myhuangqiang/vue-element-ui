@@ -1,7 +1,7 @@
 <template>
     <div id="login">
         <div class="ms-login">
-            <div class="ms-title">后台管理系统</div>
+            <div class="ms-title">渠道数据后台管理系统</div>
             <form class="el-form ms-content">
                 <div class="el-form-item is-required el-form-item--small">
                     <div>
@@ -82,6 +82,7 @@ export default {
                 font-size: 20px;
                 color: #fff;
                 border-bottom: 1px solid #ddd;
+                font-weight: bold;
             }
             .ms-content {
                 padding: 30px 30px;

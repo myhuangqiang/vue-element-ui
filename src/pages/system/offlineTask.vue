@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :isHandle='true'
@@ -43,6 +42,7 @@ import xyModal from '@/components/common/Modal/xyModal'
 import xyEdit from '@/components/common/Form/addOrEditForm'
 
 import { deleteNullProperties, buildWhere } from '@/utils/validate'
+import { mapState } from 'vuex';
 
 
 let editformData =  {}
@@ -63,10 +63,9 @@ export default {
             searchData: Object.assign({}, searchData),
             // 查询组件 start
             searchForm:[
-                {type:'Input',label:'产品名称',prop:'productname.like',width:'180px',placeholder:'请输入产品名称'},
-                {type:'Input',label:'渠道',prop:'channelvar.like',width:'180px',placeholder:'请输入渠道'},
-                {type:'Input',label:'子渠道',prop:'subchannelvar.like',width:'180px',placeholder:'请选择子渠道', change: () => '' },
-                {type:'Select',label:'状态',prop:'status',width:'180px',placeholder:'请选择状态', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
+                {type:'Input',label:'任务名称',prop:'taskname.like',width:'180px',placeholder:'请输入任务名称'},
+                {type:'Input',label:'动作',prop:'action.like',width:'180px',placeholder:'请输入渠道'},
+                // {type:'Select',label:'状态',prop:'status',width:'180px',placeholder:'请选择状态', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
             ],
             searchHandle:[
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -114,7 +113,7 @@ export default {
                 {label:'任务ID',prop:'taskid', type:'input', disabled: () => {return true}},
                 {label:'任务名称',prop:'taskname', type:'input'},
                 {label:'优先级',prop:'priority', type:'select', options: [{label: '1', value: 1}, {label: '2', value: 2}, {label: '3', value: 3}]},
-                {label:'动作',prop:'action', type:'input'},
+                {label:'动作',prop:'action', type:'select', slot: true, options: []},
                 {label:'参数',prop:'params', type:'textarea'},
                 {label:'备注',prop:'remark', type:'textarea'},
                 // {label:'状态',prop:'status', type:'switch', change: (data) => {console.log(data)} },
@@ -128,6 +127,20 @@ export default {
 
         }
     },
+    computed: {
+        ...mapState({
+            preferenceList: state => state.global.preferenceList
+        })
+    },
+    created() {
+        this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["outputaction"]]}).then(() => {
+            console.log(this.preferenceList)
+            let planactionInPreferenceList = this.preferenceList.filter((item) => {
+                return item.fieldkey == 'outputaction'
+            })
+            this.getSelectDatas(this.editForm, planactionInPreferenceList, 'outputaction')
+        })
+    },
     mounted () {
         this.quertTableDatasCount()
         this.queryTableDatas()
@@ -135,8 +148,8 @@ export default {
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('offline-task', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('offline-task', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },
@@ -150,6 +163,25 @@ export default {
                 this.tableLoading = false
                 this.tableData = res.data
                 return res
+            })
+        },
+         // 遍历select中的数据
+        getSelectDatas(data,list,prop) {
+            data.forEach((item) => {
+                if (item.prop == 'action') {
+                    let platformList = list[0].fieldvalue
+                    platformList.forEach((el) => {
+                        try {
+                            let newItem = JSON.parse(el)
+                            Object.keys(newItem).forEach((keyItem) => {
+                                item.options.push({label: keyItem,value: newItem[keyItem]})
+                            }) 
+                        }catch(error) {
+                            item.options.push({label: el,value: el})
+                        }
+                    })
+                    return false
+                }
             })
         },
         // 新增或编辑的弹出dialog

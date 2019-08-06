@@ -6,7 +6,7 @@
       <el-button 
         v-for='(item,index) in tableHandles' 
         :key="index" 
-        :size="item.size || size" 
+        :size="item.size || 'mini'" 
         :type="item.type" 
         :icon='item.icon' 
         @click="item.handle()">
@@ -50,7 +50,7 @@
                       v-if="!btn.isShow || (btn.isShow && btn.isShow(scope.$index, scope.row))"
                       :disabled="btn.isDisabled && btn.isDisabled(scope.$index, scope.row)"
                       :type="btn.type" 
-                      :size="btn.size || size" 
+                      :size="btn.size || 'mini'" 
                       :icon="btn.icon" 
                       @click.stop="btn.handle(scope.row, scope.$index)">{{btn.label}}</el-button>
                   </span>
@@ -97,20 +97,24 @@
                   :style="item.itemStyle && item.itemStyle(scope.row)" 
                   :class="item.itemClass && item.item.itemClass(scope.row)"
                 >
-                  {{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}
+                  <a download="下载" :href="(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]" style="color: #0863F5;" v-if="item.down">{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</a>
+                  <span v-else>{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</span>
                 </span>
-                <!-- 表格数据中有list数据 -->
-                <!-- <span 
-                  v-if="item.isMultiple" 
-                  :style="item.itemStyle && item.itemStyle(scope.row)" 
-                  :class="item.itemClass && item.item.itemClass(scope.row)"
-                >
-                  <span>{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</span>
-                </span> -->
               </template>
             </el-table-column>
       </el-table>
     </section>
+
+    <!-- 分割 统计数据 -->
+    <div class="source total_wrap" v-if="isTotal">
+      <span v-for="(item, index) in totalCols" :key="index">
+        <span class="label">{{item.label}}</span>
+        <span class="value">{{formatStr(totalDatas[item.prop])}}</span>
+        <el-divider direction="vertical"></el-divider>
+      </span>
+    </div>
+
+
     <!-- 分页 -->
     <section class="ces-pagination"  v-if='isPagination'>
       <el-pagination style='display: flex;justify-content: center;height: 100%;align-items: center;'
@@ -127,7 +131,7 @@
 </template>
 
 <script>
-
+import {formatStr} from '@/utils'
 export default {
   props:{
     // 表格型号：mini,medium,small
@@ -147,6 +151,11 @@ export default {
     // 是否显示表格索引
     isIndex:{ type: Boolean, default: false },
     indexLabel: { type: String, default:'序号' },
+    // 是否显示统计
+    isTotal: { type: Boolean, default: false },
+    // 统计数据
+    totalCols:{ type: Array, default:()=>[] },
+    totalDatas: { type: Object, default:()=>{} },
     // 是否显示分页
     isPagination:{ type: Boolean, default: true },
     // 分页数据
@@ -155,6 +164,7 @@ export default {
   },
   data(){
     return {
+      formatStr: formatStr
     }
   },
   watch:{
@@ -208,22 +218,43 @@ export default {
   },
 }
 </script>
-<style>
+<style lang="scss">
 .ces-handle {
   margin-bottom: 10px;
 }
 .ces-pagination {
-  margin-top: 18px;
+  padding: 18px 0;
 }
 .ces-table-require::before{
   content:'*';
   color:red;
 }
+// .ces-table {
+//   height: 500px;
+// }
 .el-table th>.cell {
   font-weight: bold;
+  font-size: 14px;
+}
+.el-table td>.cell {
   font-size: 14px;
 }
 .el-table__body-wrapper {
   height: auto !important;
 }
+
+.total_wrap {
+  padding: 24px;
+  font-size: 14px;
+  border-bottom: 1px solid #eaeefb;
+  line-height: 1.5;
+  background: #f5f7fa;
+  .label {
+    font-weight: bold;
+  }
+  .value {
+    font-size: 22px;
+  }
+}
+
 </style>

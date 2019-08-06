@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :isHandle='true'
@@ -69,11 +68,11 @@ export default {
             searchData: Object.assign({}, searchData),
             // 查询组件 start
             searchForm:[
-                {type:'Input',label:'商户名称',prop:'merchantname.like',width:'180px',placeholder:'请输入商户名称'},
-                {type:'Input',label:'主体',prop:'mainbody.like',width:'180px',placeholder:'请输入主体'},
-                {type:'Select',label:'平台',prop:'platform',width:'180px',placeholder:'请选择平台', options: [], change: () => '' },
-                {type:'Select',label:'托管云',prop:'cloudon',width:'180px',placeholder:'请选择托管云', options: [], change: () => '' },
-                {type:'Select',label:'状态',prop:'status',width:'180px',placeholder:'请选择状态', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
+                {type:'Input',label:'商户名称',prop:'merchantname.like',width:'150px',placeholder:'请输入商户名称'},
+                {type:'Input',label:'主体',prop:'mainbody.like',width:'150px',placeholder:'请输入主体'},
+                {type:'Select',label:'平台',prop:'platform',width:'180px',placeholder:'请选择', slot: true, options: [], change: () => '' },
+                {type:'Select',label:'托管云',prop:'cloudon',width:'180px',placeholder:'请选择', slot: true, options: [], change: () => '' },
+                {type:'Select',label:'状态',prop:'status',width:'120px',placeholder:'请选择', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
             ],
             searchHandle:[
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -93,13 +92,13 @@ export default {
                 {label:'返点',prop:'rebate'},
                 {label:'平台',prop:'platform'},
                 {label:'托管云',prop:'cloudon'},
-                {label:'域名',prop:'domain', width: '120px'},
+                {label:'域名',prop:'domain'},
                 {label:'协议',prop:'schema'},
                 {label:'备注',prop:'remark'},
                 {label:'状态',prop:'status', formatter: (row) => this.formatterStatus(row)},
                 {label:'操作', width: '150px',type:'Button',btnList:[
-                    {isShow: (index,row) => true, isDisabled: (index,row) => false, type:'primary',label:'编辑',handle:row=>this.edit(row)},
-                    {type:'danger',label:'删除',handle:row=> this.del(row)}
+                    {isShow: (index,row) => true, isDisabled: (index,row) => false, size: 'mini', type:'primary',label:'编辑',handle:row=>this.edit(row)},
+                    {type:'danger',label:'删除', size: 'mini', handle:row=> this.del(row)}
                 ]}
             ],
             // 操作表格按钮
@@ -146,13 +145,13 @@ export default {
         }
     },
     created() {
-        // 获取平台以及托管云列表
-        this.$store.dispatch('global/getPreferenceList').then(() => {
+        // 获取平台以及托管云列表 , {select: ["value"]}
+        this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["platform", "cloudon"]]}).then(() => {
             let platformInPreferenceList = this.preferenceList.filter((item) => {
-                return item.key == 'platform'
+                return item.fieldkey == 'platform'
             })
             let cloudonInPreferenceList = this.preferenceList.filter((item) => {
-                return item.key == 'cloudon'
+                return item.fieldkey == 'cloudon'
             })
             this.getSelectDatas(this.searchForm, platformInPreferenceList, 'platform')
             this.getSelectDatas(this.editForm, platformInPreferenceList, 'platform')
@@ -168,8 +167,8 @@ export default {
         quertTableDatasCount() {
             // 遍历this.searchData ,如果值为空，则删除对应的键值对
             deleteNullProperties(this.searchData)
-            return this.$api.query('merchant', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('merchant', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },
@@ -195,9 +194,16 @@ export default {
         getSelectDatas(data,list,prop) {
             data.forEach((item) => {
                 if (item.prop == prop) {
-                    let platformList = list[0].value
+                    let platformList = list[0].fieldvalue
                     platformList.forEach((el) => {
-                        item.options.push({label: el,value: el})
+                        try {
+                            let newItem = JSON.parse(el)
+                            Object.keys(newItem).forEach((keyItem) => {
+                                item.options.push({label: keyItem,value: newItem[keyItem]})
+                            }) 
+                        }catch(error) {
+                            item.options.push({label: el,value: el})
+                        }
                     })
                     return false
                 }

@@ -2,7 +2,7 @@
     <div>
         <search-form 
             size='medium'
-            labelWidth = '80px' 
+            labelWidth = '70px' 
             :searchData = "searchData"
             :searchForm = "searchForm"
             :searchHandle="searchHandle"
@@ -11,13 +11,16 @@
         </search-form>
 
         <xy-table 
-            size='mini'
+            size='medium'
             :isSelection='false'
+            :isTotal="true"
             :isPagination='true'
             :isHandle='true'
             :loading="tableLoading"
             :tableData='tableData' 
             :tableCols='tableCols' 
+            :totalCols='totalCols'
+            :totalDatas="totalDatas"
             :pagination='pagination'
             @refresh="refresh"
         >
@@ -34,7 +37,9 @@ import { deleteNullProperties, buildWhere } from '@/utils/validate'
 
 import { mapState } from 'vuex'
 
-let searchData = {}
+let searchData = {
+    'day.gte': new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+}
 
 export default {
     components: {
@@ -48,11 +53,12 @@ export default {
             searchData: Object.assign({}, searchData),
             // 查询组件 start
             searchForm:[
-                {type:'Select',label:'商户',prop:'merchantid',width:'180px',placeholder:'请选择', options: [], change: () => ''},
-                {type:'Select',label:'计划',prop:'planid',width:'180px',placeholder:'请选择', options: [], change: () => ''},
-                {type:'Input',label:'关键字ID',prop:'keywordid',width:'180px',placeholder:'请输入关键字'},
-                {type:'Date',label:'开始日期',prop:'day.gte',width:'180px',placeholder:'请选择开始日期'},
-                {type:'Date',label:'结束日期',prop:'day.lte',width:'180px',placeholder:'请选择结束日期'},
+                {type:'Select',label:'商户',prop:'_merchantid',width:'140px',placeholder:'请选择', options: [], change: () => ''},
+                {type:'Select',label:'计划',prop:'_planid',width:'140px',placeholder:'请选择', options: [], change: () => ''},
+                {type:'Select',label:'产品',prop:'_productid',width:'140px',placeholder:'请选择', options: [], change: () => ''},
+                {type:'Input',label:'关键字ID',prop:'_keywordid',width:'150px',placeholder:'请输入关键字ID'},
+                {type:'Date',label:'开始日期',prop:'day.gte', width:'160px',placeholder:'请选择开始日期'},
+                {type:'Date',label:'结束日期',prop:'day.lte',width:'160px',placeholder:'请选择结束日期'},
             ],
             searchHandle:[ 
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -67,9 +73,10 @@ export default {
             // 表格header
             tableCols:[
                 {label:'日期',prop:'day'},
-                {label:'商户',prop:'merchantid', formatter: (row) => this.formatterOfMerchant(row) },
-                {label:'计划',prop:'planid', formatter: (row) => this.formatterOfPlan(row) },
-                {label:'关键词ID',prop:'keywordid'},
+                {label:'商户',prop:'_merchantid', formatter: (row) => this.formatterOfMerchant(row) },
+                {label:'计划',prop:'_planid', formatter: (row) => this.formatterOfPlan(row) },
+                {label:'产品',prop:'_productid', formatter: (row) => this.formatterOfProduct(row) },
+                {label:'关键词ID',prop:'_keywordid'},
                 {label:'订单数',prop:'totalcount'},
                 {label:'付费数',prop:'totalpaidcount'},
                 {label:'付费金额',prop:'totalpaidamount'},
@@ -77,6 +84,16 @@ export default {
                 {label:'劫持付费数',prop:'hijackpaidcount'},
                 {label:'劫持付费金额',prop:'hijackpaidamount'},
             ],
+            // 统计数据
+            totalCols: [
+                {label: '订单数：', prop: 'totalcount'},
+                {label: '付费数：', prop: 'totalpaidcount'},
+                {label: '付费金额：', prop: 'totalpaidamount'},
+                {label: '劫持订单数：', prop: 'hijackcount'},
+                {label: '劫持付费数：', prop: 'hijackpaidcount'},
+                {label: '劫持付费金额：', prop: 'hijackpaidamount'},
+            ],
+            totalDatas:{},
             // 翻页
             pagination:{
                 limit: 10,
@@ -95,14 +112,18 @@ export default {
     computed: {
         ...mapState({
             merchantList: state => state.global.merchantList,
-            planList: state => state.global.planList
+            planList: state => state.global.planList,
+            productList: state => state.global.productList
         })
     },
     async created() {
-        await this.$store.dispatch('global/getMerchantList', {select: ['merchantid', 'merchantname']})
+        let p1 = this.$store.dispatch('global/getMerchantList', {select: ['merchantid', 'merchantname']})
+        let p2 = this.$store.dispatch('global/getPlanList', {select: ['planid', 'planname']})
+        let p3 = this.$store.dispatch('global/getProductList',{select: ['productid', 'productname']})
+        let res = await Promise.all([p1, p2, p3])
         this.searchForm[0].options = this.merchantList
-        await this.$store.dispatch('global/getPlanList', {select: ['planid', 'planname']})
         this.searchForm[1].options = this.planList
+        this.searchForm[2].options = this.productList
         this.quertTableDatasCount()
         this.queryTableDatas()
     },
@@ -111,8 +132,9 @@ export default {
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('orderdata-dayagr', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('orderdata-dayagr', {select: ['count(1) as count', 'sum(totalcount) as totalcount', 'sum(totalpaidcount) as totalpaidcount', 'sum(totalpaidamount) as totalpaidamount','sum(hijackcount) as hijackcount', 'sum(hijackpaidcount) as hijackpaidcount', 'sum(hijackpaidamount) as hijackpaidamount'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
+                this.totalDatas = res.data[0]
                 return res
             })
         },
@@ -121,7 +143,7 @@ export default {
             deleteNullProperties(this.searchData)
             params.offset = (this.pagination.offset - 1) * this.pagination.limit
             params.limit = this.pagination.limit
-            params.orderBy = 'day desc'
+            params.orderBy = 'id desc'
             params.where = buildWhere(this.searchData)
             return this.$api.query('orderdata-dayagr', params).then(res => {
                 this.tableLoading = false
@@ -131,7 +153,7 @@ export default {
         },
         formatterOfMerchant(row) {
             let filterMerchant = this.merchantList.filter(function(product){
-                return product.value == row.merchantid
+                return product.value == row._merchantid
             })
             if (filterMerchant.length) {
                 return filterMerchant[0].label
@@ -139,14 +161,23 @@ export default {
         },
         formatterOfPlan(row) {
             let filterPlan = this.planList.filter(function(product){
-                return product.value == row.planid
+                return product.value == row._planid
             })
             if (filterPlan.length) {
                 return filterPlan[0].label
             }
         },
+        formatterOfProduct(row) {
+            let filterProduct = this.productList.filter(function(product){
+                return product.value == row._productid
+            })
+            if (filterProduct.length) {
+                return filterProduct[0].label
+            }
+        },
         // 点击查询按钮
         searchHandleForm() {
+            console.log(this.searchData['day.gte'])
             if (this.searchData['day.gte'] && this.searchData['day.lte']) {
                 if (new Date(this.searchData['day.lte']).getTime() < new Date(this.searchData['day.gte']).getTime()) {
                     this.$message.error('开始日期不能大于结束日期')
@@ -183,17 +214,17 @@ export default {
                 }
             }).then(() => {
                 import('@/vendor/Export2Excel').then(excel => {
-                    const tHeader = ['日期', '商户', '计划', '关键词ID', '订单数', '付费数', '付费金额', '劫持订单数', '劫持付费数', '劫持付费金额']
-                    const filterVal = ['day', 'merchantid', 'planid', 'keywordid', 'totalcount', 'totalpaidcount', 'totalpaidamount', 'hijackcount', 'hijackpaidcount', 'hijackpaidamount']
+                    const tHeader = ['日期', '商户', '计划', ' 产品', '关键词ID', '订单数', '付费数', '付费金额', '劫持订单数', '劫持付费数', '劫持付费金额']
+                    const filterVal = ['day', '_merchantid', '_planid', '_productid', '_keywordid', 'totalcount', 'totalpaidcount', 'totalpaidamount', 'hijackcount', 'hijackpaidcount', 'hijackpaidamount']
                     list.forEach((item) => {
                         this.merchantList.forEach((el) => {
-                            if (item.merchantid == el.value) {
-                                item.merchantid = el.label
+                            if (item._merchantid == el.value) {
+                                item._merchantid = el.label
                             }
                         })
                         this.planList.forEach((el) => {
-                            if (item.planid == el.value) {
-                                item.planid = el.label
+                            if (item._planid == el.value) {
+                                item._planid = el.label
                             }
                         })
                     })

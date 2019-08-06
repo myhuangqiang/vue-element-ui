@@ -11,7 +11,6 @@
         </search-form>
 
         <xy-table 
-            size='mini'
             :isSelection='false'
             :isPagination='true'
             :isHandle='true'
@@ -63,10 +62,10 @@ export default {
             searchData: Object.assign({}, searchData),
             // 查询组件 start
             searchForm:[
-                {type:'Input',label:'产品名称',prop:'productname.like',width:'180px',placeholder:'请输入产品名称'},
-                {type:'Input',label:'渠道',prop:'channelvar.like',width:'180px',placeholder:'请输入渠道'},
-                {type:'Input',label:'子渠道',prop:'subchannelvar.like',width:'180px',placeholder:'请选择子渠道', change: () => '' },
-                {type:'Select',label:'状态',prop:'status',width:'180px',placeholder:'请选择状态', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
+                {type:'Input',label:'产品名称',prop:'productname.like',width:'150px',placeholder:'请输入产品名称'},
+                {type:'Input',label:'渠道',prop:'channelvar.like',width:'150px',placeholder:'请输入渠道'},
+                {type:'Input',label:'子渠道',prop:'subchannelvar.like',width:'150px',placeholder:'请选择', change: () => '' },
+                {type:'Select',label:'状态',prop:'status',width:'150px',placeholder:'请选择', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
             ],
             searchHandle:[
                 {label:'查询',type:'primary',handle:()=>this.searchHandleForm()},
@@ -136,8 +135,8 @@ export default {
     methods: {
         quertTableDatasCount() {
             deleteNullProperties(this.searchData)
-            return this.$api.query('product', {aggregation: 'count', where: buildWhere(this.searchData)}).then(res => {
-                this.pagination.total = parseInt(res.data.count)
+            return this.$api.query('product', {select: ['count(1) as count'], where: buildWhere(this.searchData)}).then(res => {
+                this.pagination.total = parseInt(res.data[0].count)
                 return res
             })
         },

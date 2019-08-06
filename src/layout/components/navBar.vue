@@ -21,12 +21,12 @@
             <el-dropdown>
                 <span class="el-dropdown-link">
                     <img width="24" height="24"  src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" alt="">
-                    <span>{{userInfos.userName}}</span>
+                    <span>{{userInfos.userName ? userInfos.userName : ''}}</span>
                     <i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item icon="el-icon-plus">个人设置</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-circle-plus" @click.native="quit">退出登录</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-s-custom">个人设置</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-switch-button" @click.native="quit">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>
         </div>

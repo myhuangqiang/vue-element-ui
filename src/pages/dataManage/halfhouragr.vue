@@ -41,8 +41,6 @@ let year = new Date().getFullYear()
 let month = new Date().getMonth()
 let day = new Date().getDate()
 
-console.log(year,month,day)
-
 let searchData = {
     'daytime.gte': new Date(year,month, day)
 }

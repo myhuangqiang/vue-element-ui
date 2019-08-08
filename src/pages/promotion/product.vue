@@ -152,18 +152,6 @@ export default {
                 return res
             })
         },
-        // 遍历select中的数据
-        getSelectDatas(data,list,prop) {
-            data.forEach((item) => {
-                if (item.prop == prop) {
-                    let platformList = list[0].value
-                    platformList.forEach((el) => {
-                        item.options.push({label: el,value: el})
-                    })
-                    return false
-                }
-            })
-        },
         // 新增或编辑的弹出dialog
         dialogShow() {
             this.show = false

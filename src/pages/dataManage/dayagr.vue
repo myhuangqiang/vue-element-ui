@@ -38,7 +38,7 @@ import { deleteNullProperties, buildWhere } from '@/utils/validate'
 import { mapState } from 'vuex'
 
 let searchData = {
-    'day.gte': new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+    'day.gte': new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 1)
 }
 
 export default {
@@ -177,7 +177,6 @@ export default {
         },
         // 点击查询按钮
         searchHandleForm() {
-            console.log(this.searchData['day.gte'])
             if (this.searchData['day.gte'] && this.searchData['day.lte']) {
                 if (new Date(this.searchData['day.lte']).getTime() < new Date(this.searchData['day.gte']).getTime()) {
                     this.$message.error('开始日期不能大于结束日期')

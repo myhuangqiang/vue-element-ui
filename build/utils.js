@@ -47,9 +47,9 @@ exports.cssLoaders = function (options) {
     if (options.extract) {
       return ExtractTextPlugin.extract({
         use: loaders,
-        fallback: 'vue-style-loader',
+        fallback: 'vue-style-loader'
         // 解决相对路径下css 资源访问
-        publicPath: '../../'
+        // publicPath: '../../'
       })
     } else {
       return ['vue-style-loader'].concat(loaders)

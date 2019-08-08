@@ -45,7 +45,9 @@ import { deleteNullProperties, buildWhere } from '@/utils/validate'
 
 import { mapState } from 'vuex'
 
-let editformData =  {}
+let editformData =  {
+    // merchantname: null
+}
 let searchData = {}
 
 export default {
@@ -137,16 +139,16 @@ export default {
                 {label:'密码',prop:'adminpwd', type:'input'},
             ],
             // 编辑表单的数据
-            editData: Object.assign({}, {}, editformData ),
+            editData: Object.assign({}, {}, editformData),
             // 表单验证
             editRules: {
                 merchantname: [{requied: true, message: '请输入商户名称', trigger: 'blur'}]
             },
         }
     },
-    created() {
+    async created() {
         // 获取平台以及托管云列表 , {select: ["value"]}
-        this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["platform", "cloudon"]]}).then(() => {
+        await this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["platform", "cloudon"]]}).then(() => {
             let platformInPreferenceList = this.preferenceList.filter((item) => {
                 return item.fieldkey == 'platform'
             })
@@ -158,10 +160,10 @@ export default {
             this.getSelectDatas(this.searchForm, cloudonInPreferenceList, 'cloudon')
             this.getSelectDatas(this.editForm, cloudonInPreferenceList, 'cloudon')
         })
-    },
-    mounted () {
         this.quertTableDatasCount()
         this.queryTableDatas()
+    },
+    mounted () {
     },
     methods: {
         quertTableDatasCount() {
@@ -194,17 +196,19 @@ export default {
         getSelectDatas(data,list,prop) {
             data.forEach((item) => {
                 if (item.prop == prop) {
-                    let platformList = list[0].fieldvalue
-                    platformList.forEach((el) => {
-                        try {
-                            let newItem = JSON.parse(el)
-                            Object.keys(newItem).forEach((keyItem) => {
-                                item.options.push({label: keyItem,value: newItem[keyItem]})
-                            }) 
-                        }catch(error) {
-                            item.options.push({label: el,value: el})
-                        }
-                    })
+                    let platformList = list[0] ? list[0].fieldvalue : []
+                    if (platformList && platformList.length) {
+                        platformList.forEach((el) => {
+                            try {
+                                let newItem = JSON.parse(el)
+                                Object.keys(newItem).forEach((keyItem) => {
+                                    item.options.push({label: keyItem,value: newItem[keyItem]})
+                                }) 
+                            }catch(error) {
+                                item.options.push({label: el,value: el})
+                            }
+                        })
+                    }
                     return false
                 }
             })
@@ -223,6 +227,7 @@ export default {
             let editRow = JSON.parse(JSON.stringify(row))
             this.dialogDatas.title = 'isEdit'
             this.editData = editRow
+            console.log(this.editData)
         },
         formatterStatus(row) {
             if (row.status == 1) {

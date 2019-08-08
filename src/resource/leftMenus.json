@@ -11,6 +11,49 @@
             },
             "childs": null
         },
+
+        {
+            "entity": {
+                "name": "test",
+                "icon": "el-icon-star-off",
+                "alias": "测试",
+                "value": "null",
+                "discription": "测试模块"
+            },
+            "childs": [
+                {
+                    "entity": {
+                        "name": "editor",
+                        "icon": "el-icon-s-operation",
+                        "alias": "富文本",
+                        "value": "/test/editor",
+                        "discription": "富文本"
+                    },
+                    "childs": null
+                },
+                {
+                    "entity": {
+                        "name": "testpage",
+                        "icon": "el-icon-s-operation",
+                        "alias": "测试页面",
+                        "value": "/test/testpage",
+                        "discription": "测试页面"
+                    },
+                    "childs": null
+                },
+                {
+                    "entity": {
+                        "name": "formrules",
+                        "icon": "el-icon-s-operation",
+                        "alias": "表单验证",
+                        "value": "/test/formrules",
+                        "discription": "表单验证"
+                    },
+                    "childs": null
+                }
+            ]
+        },
+
         {
             "entity": {
                 "name": "systemManage",
@@ -125,16 +168,6 @@
                 },
                 {
                     "entity": {
-                        "name": "orderDataHalfhouragr",
-                        "icon": "el-icon-s-marketing",
-                        "alias": "半小时渠道数据",
-                        "value": "/datamanage/halfhouragr",
-                        "discription": "半小时渠道数据"
-                    },
-                    "childs": null
-                },
-                {
-                    "entity": {
                         "name": "orderdataMerchantagr",
                         "icon": "el-icon-monitor",
                         "alias": "商户汇总",
@@ -142,7 +175,18 @@
                         "discription": "商户汇总"
                     },
                     "childs": null
+                },
+                {
+                    "entity": {
+                        "name": "orderDataHalfhouragr",
+                        "icon": "el-icon-s-marketing",
+                        "alias": "半小时渠道数据",
+                        "value": "/datamanage/halfhouragr",
+                        "discription": "半小时渠道数据"
+                    },
+                    "childs": null
                 }
+                
             ]
         }
     ]

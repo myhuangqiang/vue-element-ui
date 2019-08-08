@@ -2,10 +2,8 @@ import { fetchPost, fetchGet, fetchPut } from '@/axios/fetch'
 import store from '@/store'
 
 // 环境的切换
-let proxyUrl = ''
-if (process.env.NODE_ENV == 'development') {
-    proxyUrl = '/api';
-}
+let proxyUrl = '/api';
+
 
 export default {
 

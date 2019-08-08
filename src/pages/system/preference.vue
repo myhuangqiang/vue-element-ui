@@ -134,7 +134,6 @@ export default {
         // 表格数据编辑按钮
         edit(row) {
             this.show = true
-            console.log(row)
             this.dialogDatas.title = 'isEdit'
             this.editData = row
         },

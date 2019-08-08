@@ -29,6 +29,9 @@ module.exports = {
       '@': resolve('src'),
     }
   },
+  // externals: {
+  //   'element-ui': 'ELEMENT'
+  // },
   module: {
     rules: [
       {

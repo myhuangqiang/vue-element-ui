@@ -97,7 +97,7 @@
                   :style="item.itemStyle && item.itemStyle(scope.row)" 
                   :class="item.itemClass && item.item.itemClass(scope.row)"
                 >
-                  <a download="下载" :href="(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]" style="color: #0863F5;" v-if="item.down">{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</a>
+                  <a @click="downLoad((item.formatter && item.formatter(scope.row)) || scope.row[item.prop])" :download="downloadUrl" :href="(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]" style="color: #0863F5;" v-if="item.down">{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</a>
                   <span v-else>{{(item.formatter && item.formatter(scope.row)) || scope.row[item.prop]}}</span>
                 </span>
               </template>
@@ -164,7 +164,9 @@ export default {
   },
   data(){
     return {
-      formatStr: formatStr
+      formatStr: formatStr,
+
+      downloadUrl: ''
     }
   },
   watch:{
@@ -196,14 +198,17 @@ export default {
     },
     
     handleCurrentChange(val){
-      console.log('handleCurrentChange' + val)
       this.pagination.offset = val
       this.$emit('refresh');
     },
     handleSizeChange(val) {
-      console.log(val)
       this.pagination.limit = val
       this.$emit('refresh');
+    },
+
+    // 文件下载
+    downLoad(link) {
+      this.downloadUrl = link.split('/')[2]
     },
     
     // tableRowClassName({rowIndex}) {

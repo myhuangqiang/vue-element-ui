@@ -167,7 +167,6 @@ export default {
             this.show = true
             this.dialogDatas.title = '新增'
             this.editData = Object.assign({}, {}, editformData )
-            console.log(this.editData)
         },
         // 表格数据编辑按钮
         edit(row) {

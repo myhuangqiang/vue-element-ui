@@ -35,7 +35,7 @@ import { deleteNullProperties, buildWhere } from '@/utils/validate'
 import { mapState } from 'vuex'
 
 let searchData = {
-    'day.gte': new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())
+    'day.gte': new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-1)
 }
 
 export default {

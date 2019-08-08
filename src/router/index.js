@@ -7,6 +7,11 @@ const Login = () => import('@/pages/login')
 const Main = () => import('@/pages/main')
 const Home = () => import('@/pages/home')
 
+// 自行测试模块
+const Editor = () => import('@/pages/test/editor')
+const TestPage = () => import('@/pages/test/testpage')
+const FormRules = () => import('@/pages/test/formRules')
+
 const Merchant = () => import('@/pages/promotion/merchant')
 const Product = () => import('@/pages/promotion/product')
 const Plan = () => import('@/pages/promotion/plan')
@@ -29,7 +34,6 @@ const Error404 = () => import('@/pages/errorPages/404')
 Vue.use(Router)
 
 const router = new Router({
-  base: '/xy-channel-admin/',
   mode: 'history',
   routes: [
     {
@@ -57,6 +61,35 @@ const router = new Router({
         },
       ]
     },
+    // 自行测试路由
+    {
+      name: "testManage",
+      path: '/test',
+      component: Main,
+      redirect:'/test/editor',
+      meta: { title: '测试模块' },
+      children: [
+        {
+          name: "富文本",
+          path: '/test/editor',
+          component: Editor,
+          meta: { title: '富文本' }
+        },
+        {
+          name: "测试页面",
+          path: '/test/testpage',
+          component: TestPage,
+          meta: { title: '测试页面' }
+        },
+        {
+          name: "表单验证",
+          path: '/test/formrules',
+          component: FormRules,
+          meta: { title: '表单验证' }
+        }
+      ]
+    },
+
     {
       name: "promotion",
       path: '/promotion',
@@ -90,6 +123,7 @@ const router = new Router({
         }
       ]
     },
+
     {
       name: "systemManage",
       path: '/system',

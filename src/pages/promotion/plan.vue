@@ -92,11 +92,12 @@ export default {
                         return '否'
                     }
                 }},
+                {label:'劫持页',prop:'hjpage', width: '100px'},
                 {label:'劫持关键词',prop:'hjkeyword', width: '100px'},
                 {label:'导入文件', prop:'material', down: true, formatter: (row) => {
-                    // if (row.material) {
-                    //     return '/' + row.material
-                    // }
+                    if (row.material) {
+                        return '/' + row.material
+                    }
                 }},
                 {label:'导出动作',prop:'outputaction', formatter: (row) =>  this.formatterOfOutputaction(row)},
                 {label:'导出文件',prop:'output', down: true},
@@ -133,6 +134,7 @@ export default {
                 {label:'产品名称',prop:'_productid', type:'select', options: []},
                 {label:'额外参数',prop:'extraparam', type:'input'},
                 {label:'是否劫持',prop:'hijack', type:'select', options: [{label: '否', value: 0}, {label: '是', value: 1}]},
+                {label:'劫持页',prop:'hjpage', type:'input'},
                 {label:'劫持目标',prop:'hjtarget', type:'input'},
                 {label:'劫持关键词',prop:'hjkeyword', type:'input'},
                 {label:'计划关键字', prop: 'material', type:'upload'},
@@ -210,7 +212,7 @@ export default {
             }
         },
         formatterOfOutputaction(row) {
-            let filteroutputaction= this.editForm[9].options.filter(function(product){
+            let filteroutputaction= this.editForm[10].options.filter(function(product){
                 return product.value == row.outputaction
             })
             if (filteroutputaction.length) {
@@ -242,17 +244,19 @@ export default {
         getSelectDatas(data,list,prop) {
             data.forEach((item) => {
                 if (item.prop == prop) {
-                    let platformList = list[0].fieldvalue
-                    platformList.forEach((el) => {
-                        try {
-                            let newItem = JSON.parse(el)
-                            Object.keys(newItem).forEach((keyItem) => {
-                                item.options.push({label: keyItem,value: newItem[keyItem]})
-                            }) 
-                        }catch(error) {
-                            item.options.push({label: el,value: el})
-                        }
-                    })
+                    let platformList = list[0] ? list[0].fieldvalue : []
+                    if (platformList && platformList.length) {
+                        platformList.forEach((el) => {
+                            try {
+                                let newItem = JSON.parse(el)
+                                Object.keys(newItem).forEach((keyItem) => {
+                                    item.options.push({label: keyItem,value: newItem[keyItem]})
+                                }) 
+                            }catch(error) {
+                                item.options.push({label: el,value: el})
+                            }
+                        })
+                    }
                     return false
                 }
             })
@@ -291,7 +295,7 @@ export default {
             let material = row.material
             // let fileFormat = material.substr(material.lastIndexOf("."))
             // let exportFile = `downs/${createUniqueString()}${fileFormat}`
-            let exportFile = `downs/${createUniqueString()}.csv`
+            let exportFile = `/downloads/${createUniqueString()}.csv`
             let planId = row.planid
             // 创建一个离线任务,传action、exportFile
             this.$api.add('offline-task', {action: row.outputaction, taskname: createUniqueString(), output: exportFile, remark: '自动生成', params: {"planid": row.planid}}).then(res => {

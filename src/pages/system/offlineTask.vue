@@ -64,7 +64,7 @@ export default {
             // 查询组件 start
             searchForm:[
                 {type:'Input',label:'任务名称',prop:'taskname.like',width:'180px',placeholder:'请输入任务名称'},
-                {type:'Input',label:'动作',prop:'action.like',width:'180px',placeholder:'请输入渠道'},
+                {type:'Input',label:'动作',prop:'action.like',width:'180px',placeholder:'请输入动作'},
                 // {type:'Select',label:'状态',prop:'status',width:'180px',placeholder:'请选择状态', options: [{label:'正常',value:'1'},{label:'停用',value:'2'}], change: () => ''},
             ],
             searchHandle:[
@@ -81,10 +81,11 @@ export default {
                 {label:'任务ID',prop:'taskid'},
                 {label:'任务名称',prop:'taskname'},
                 {label:'优先级',prop:'priority'},
-                {label:'动作', prop: 'action'},
+                {label:'动作', prop: 'action', formatter: (row) => this.actionFormatter(row)},
                 {label:'参数',prop:'params'},
                 {label:'备注',prop:'remark'},
                 {label:'状态',prop:'status'},
+                {label:'更新时间',prop:'uptime'},
                 {label:'操作', width: '150px',type:'Button',btnList:[
                     {isShow: (index,row) => true, isDisabled: (index,row) => false, type:'primary',label:'编辑',handle:row=>this.edit(row)},
                     {type:'danger',label:'删除',handle:row=> this.del(row)}
@@ -133,17 +134,16 @@ export default {
         })
     },
     created() {
-        this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["outputaction"]]}).then(() => {
-            console.log(this.preferenceList)
+    },
+    async mounted () {
+        await this.$store.dispatch('global/getPreferenceList', {where: ['IN', 'fieldkey', ["outputaction"]]}).then(() => {
             let planactionInPreferenceList = this.preferenceList.filter((item) => {
                 return item.fieldkey == 'outputaction'
             })
             this.getSelectDatas(this.editForm, planactionInPreferenceList, 'outputaction')
         })
-    },
-    mounted () {
-        this.quertTableDatasCount()
-        this.queryTableDatas()
+        await this.quertTableDatasCount()
+        await this.queryTableDatas()
     },
     methods: {
         quertTableDatasCount() {
@@ -165,21 +165,34 @@ export default {
                 return res
             })
         },
+        actionFormatter(row) {
+            let valueObj = this.editForm[3].options.find((item) => {
+                return item.value == row.action
+            })
+            if (valueObj) {
+                return valueObj.label
+            }
+            
+        },
          // 遍历select中的数据
         getSelectDatas(data,list,prop) {
             data.forEach((item) => {
                 if (item.prop == 'action') {
-                    let platformList = list[0].fieldvalue
-                    platformList.forEach((el) => {
-                        try {
-                            let newItem = JSON.parse(el)
-                            Object.keys(newItem).forEach((keyItem) => {
-                                item.options.push({label: keyItem,value: newItem[keyItem]})
-                            }) 
-                        }catch(error) {
-                            item.options.push({label: el,value: el})
+                    let platformList = list[0] ? list[0].fieldvalue : []
+                    if (platformList && platformList.length) {
+                        if (platformList.length) {
+                            platformList.forEach((el) => {
+                                try {
+                                    let newItem = JSON.parse(el)
+                                    Object.keys(newItem).forEach((keyItem) => {
+                                        item.options.push({label: keyItem,value: newItem[keyItem]})
+                                    }) 
+                                }catch(error) {
+                                    item.options.push({label: el,value: el})
+                                }
+                            })
                         }
-                    })
+                    }
                     return false
                 }
             })

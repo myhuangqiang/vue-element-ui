@@ -162,6 +162,8 @@ export default {
         } else {
             this.fileList = []
         }
+
+        console.log(this.editRules)
     },
 
 

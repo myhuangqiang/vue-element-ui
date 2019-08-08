@@ -14,6 +14,7 @@ import api from '@/axios/api' // 导入api接口
 Vue.prototype.$api = api // 将api挂载到vue的原型上
 
 import './styles/reset.css'
+
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 

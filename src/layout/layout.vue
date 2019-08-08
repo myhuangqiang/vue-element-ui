@@ -138,10 +138,8 @@ export default {
 			position: relative;
 			background: #fff;
 			.container {
-				padding: 20px 14px 0;
-				// position: absolute;
-				// left: 0;
-				// top: 82px;
+				padding: 20px 14px;
+				// height: calc(100% - 82px);
 			}
 		}
 	}
